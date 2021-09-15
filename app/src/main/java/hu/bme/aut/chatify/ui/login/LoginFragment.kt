@@ -26,6 +26,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.material.textfield.TextInputLayout
 import hu.bme.aut.chatify.R
 import hu.bme.aut.chatify.databinding.FragmentLoginBinding
+import hu.bme.aut.chatify.navigation.BottomNavigationFragment
 import hu.bme.aut.chatify.ui.main.MainFragment
 import hu.bme.aut.chatify.ui.pwreset.PasswordResetFragment
 import hu.bme.aut.chatify.ui.signup.SignUpFragment
@@ -184,7 +185,7 @@ class LoginFragment : RainbowCakeFragment<LoginViewState, LoginViewModel>() {
             is LoginReady -> {
                 Toast.makeText(requireContext(), viewState.response, Toast.LENGTH_SHORT).show()
                 navigator?.replace(
-                    MainFragment(),
+                    BottomNavigationFragment(),
                     R.anim.slide_right_new,
                     R.anim.slide_right_old,
                     R.anim.slide_right_new,

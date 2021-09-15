@@ -5,6 +5,7 @@ import co.zsmb.rainbowcake.base.RainbowCakeViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.ktx.database
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import hu.bme.aut.chatify.model.User
 import kotlinx.coroutines.launch
@@ -23,8 +24,10 @@ class SignUpViewModel @Inject constructor(
         val auth = FirebaseAuth.getInstance()
         auth.createUserWithEmailAndPassword(email, password).addOnSuccessListener {
             it.user?.updateProfile(UserProfileChangeRequest.Builder().setDisplayName(name).build())
-            val users = Firebase.database.reference.child("Users")
-            users.child(it.user?.uid.toString()).setValue(User(it.user?.uid.toString())).addOnSuccessListener {
+            //val users = Firebase.database.reference.child("Users")
+            //users.child(it.user?.uid.toString()).setValue(User(it.user?.uid.toString(), it.user?.displayName.toString(), "")).addOnSuccessListener {
+            val users = Firebase.firestore.collection("Users")
+            users.document(it.user?.uid.toString()).set(User(it.user?.uid.toString(), it.user?.displayName.toString(), "")).addOnSuccessListener {
                 viewState = SignUpReady("Successful registration")
             }.addOnFailureListener {
                 viewState = NetworkError("Network error")

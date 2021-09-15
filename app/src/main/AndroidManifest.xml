@@ -3,6 +3,7 @@
     package="hu.bme.aut.chatify">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".ChatifyApplication"
@@ -12,6 +13,11 @@
         android:roundIcon="@mipmap/ic_logo_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Chatify">
+        <activity android:name=".navigation.BottomNavigationFragment"></activity>
+        <activity android:name=".BottomNavActivity" />
+        <activity
+            android:name=".BottomNavigationActivity"
+            android:label="@string/title_activity_bottom_navigation" />
         <activity android:name=".NavigationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

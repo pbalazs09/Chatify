@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import hu.bme.aut.chatify.R
 import hu.bme.aut.chatify.model.User
@@ -44,10 +45,19 @@ class LoginViewModel @Inject constructor(
             .addOnCompleteListener(requireActivity) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
-                    val users = Firebase.database.reference.child("Users")
-                    users.child(Firebase.auth.currentUser?.uid.toString()).get().addOnSuccessListener {
-                        if(it.value == null){
-                            users.child(Firebase.auth.currentUser?.uid.toString()).setValue(User(Firebase.auth.currentUser?.uid.toString())).addOnSuccessListener {
+                    //val users = Firebase.database.reference.child("Users")
+                    val database = Firebase.firestore
+                    database.collection("Users").document(Firebase.auth.currentUser?.uid.toString()).get().addOnSuccessListener {
+                        if(it.data == null){
+                            val currentUser = Firebase.auth.currentUser
+                            database.collection("Users").document(Firebase.auth.currentUser?.uid.toString()).set(
+                                //User(currentUser?.uid.toString(), currentUser?.displayName.toString(), currentUser?.photoUrl.toString())
+                                hashMapOf(
+                                        "id" to currentUser?.uid.toString(),
+                                        "name" to currentUser?.displayName.toString(),
+                                        "photoUrl" to currentUser?.photoUrl.toString()
+                                )
+                            ).addOnSuccessListener {
                                 viewState = LoginReady("Successful login")
                             }.addOnFailureListener {
                                 viewState = NetworkError("Network error")
@@ -74,10 +84,11 @@ class LoginViewModel @Inject constructor(
             .addOnCompleteListener(requireActivity) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
-                    val users = Firebase.database.reference.child("Users")
-                    users.child(Firebase.auth.currentUser?.uid.toString()).get().addOnSuccessListener {
-                        if(it.value == null){
-                            users.child(Firebase.auth.currentUser?.uid.toString()).setValue(User(Firebase.auth.currentUser?.uid.toString())).addOnSuccessListener {
+                    val database = Firebase.firestore
+                    database.collection("Users").document(Firebase.auth.currentUser?.uid.toString()).get().addOnSuccessListener {
+                        if(it.data == null){
+                            val currentUser = Firebase.auth.currentUser
+                            database.collection("Users").document(Firebase.auth.currentUser?.uid.toString()).set(User(currentUser?.uid.toString(), currentUser?.displayName.toString(), currentUser?.photoUrl.toString())).addOnSuccessListener {
                                 viewState = LoginReady("Success")
                             }.addOnFailureListener {
                                 viewState = NetworkError("Error")

@@ -8,6 +8,7 @@ import co.zsmb.rainbowcake.base.RainbowCakeFragment
 import co.zsmb.rainbowcake.dagger.getViewModelFromFactory
 import co.zsmb.rainbowcake.extensions.exhaustive
 import co.zsmb.rainbowcake.navigation.navigator
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -15,6 +16,7 @@ import com.squareup.picasso.Picasso
 import hu.bme.aut.chatify.R
 import hu.bme.aut.chatify.databinding.FragmentMainBinding
 import hu.bme.aut.chatify.ui.login.LoginFragment
+import hu.bme.aut.chatify.ui.people.PeopleFragment
 import hu.bme.aut.chatify.ui.profile.ProfileFragment
 
 class MainFragment : RainbowCakeFragment<MainViewState, MainViewModel>() {
@@ -28,6 +30,7 @@ class MainFragment : RainbowCakeFragment<MainViewState, MainViewModel>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         binding.civProfilePicture.setOnClickListener {
             navigator?.add(ProfileFragment(),
                 R.anim.slide_right_new,

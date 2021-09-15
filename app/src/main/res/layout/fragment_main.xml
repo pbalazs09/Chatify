@@ -69,4 +69,5 @@
         app:layout_constraintTop_toBottomOf="@+id/ablTop"
         app:layout_constrainedHeight="true"
         tools:listitem="@layout/conversation_list_item" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
