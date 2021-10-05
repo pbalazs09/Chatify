@@ -1,7 +1,7 @@
 package hu.bme.aut.chatify.model
 
 data class User (
-    val id: String,
-    val name: String,
-    val photoUrl: String
+    val id: String = "",
+    val name: String = "",
+    val photoUrl: String = ""
 )

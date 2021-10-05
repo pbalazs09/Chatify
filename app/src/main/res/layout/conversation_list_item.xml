@@ -19,6 +19,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Sample text"
+        android:textSize="20sp"
+        android:textStyle="bold"
         android:layout_marginStart="5dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintStart_toEndOf="@+id/circleImageView"
@@ -29,8 +31,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Sample text"
-        android:textSize="12sp"
+        android:textSize="18sp"
         android:layout_marginStart="5dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:maxLength="25"
+        android:singleLine="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/circleImageView"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
@@ -40,7 +46,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Sample text"
-        android:textSize="12sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline3"
@@ -58,6 +64,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="325dp" />
+        app:layout_constraintGuide_begin="291dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

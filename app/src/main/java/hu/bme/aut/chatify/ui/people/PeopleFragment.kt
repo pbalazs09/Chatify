@@ -10,9 +10,8 @@ import co.zsmb.rainbowcake.base.RainbowCakeFragment
 import co.zsmb.rainbowcake.dagger.getViewModelFromFactory
 import co.zsmb.rainbowcake.extensions.exhaustive
 import co.zsmb.rainbowcake.navigation.navigator
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Picasso
@@ -21,7 +20,6 @@ import hu.bme.aut.chatify.adapter.PeopleAdapter
 import hu.bme.aut.chatify.databinding.FragmentPeopleBinding
 import hu.bme.aut.chatify.model.User
 import hu.bme.aut.chatify.ui.chat.ChatFragment
-import hu.bme.aut.chatify.ui.main.MainFragment
 import hu.bme.aut.chatify.ui.profile.ProfileFragment
 import kotlinx.android.synthetic.main.fragment_people.*
 
@@ -61,27 +59,27 @@ class PeopleFragment : RainbowCakeFragment<PeopleViewState, PeopleViewModel>(), 
     }
 
     private fun initRecyclerView() {
+        var options = FirestoreRecyclerOptions.Builder<User>()
+            .setQuery(Firebase.firestore
+                .collection("Users")
+                .whereNotEqualTo("id", Firebase.auth.currentUser?.uid.toString()), User::class.java)
+            .build()
         peopleRecyclerView = peopleList
-        peopleAdapter = PeopleAdapter(this)
+        peopleAdapter = PeopleAdapter(options, this)
         peopleRecyclerView.adapter = peopleAdapter
         peopleRecyclerView.layoutManager = LinearLayoutManager(
                 requireContext(),
                 LinearLayoutManager.VERTICAL,
                 false
         )
-        Firebase.firestore.collection("Users").get().addOnSuccessListener {
-            if(!it.isEmpty){
-                for(userHash in it.documents){
-                    if((userHash.data?.get("id") as String) != Firebase.auth.currentUser?.uid){
-                        val id = userHash.data?.get("id") as String
-                        val photoUrl = userHash.data?.get("photoUrl") as String
-                        val name = userHash.data?.get("name") as String
-                        people.add(User(id, name, photoUrl))
-                    }
-                }
-                peopleAdapter.update(people)
-            }
+        peopleAdapter.startListening()
+    }
+
+    override fun onDestroy() {
+        if(this::peopleAdapter.isInitialized){
+            peopleAdapter.stopListening()
         }
+        super.onDestroy()
     }
 
     override fun getViewResource(): Int = R.layout.fragment_people
@@ -97,10 +95,12 @@ class PeopleFragment : RainbowCakeFragment<PeopleViewState, PeopleViewModel>(), 
             Loading -> {
 
             }
+            is NetworkError -> TODO()
+            is PeopleReady -> TODO()
         }.exhaustive
     }
 
-    override fun onItemClicked(position: Int) {
-        navigator?.add(ChatFragment(people[position]))
+    override fun onItemClicked(userId: String) {
+        navigator?.add(ChatFragment(userId))
     }
 }

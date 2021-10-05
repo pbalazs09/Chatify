@@ -22,18 +22,20 @@ class SignUpViewModel @Inject constructor(
     fun signUp(name: String, email: String, password: String) = viewModelScope.launch{
         viewState = Loading
         val auth = FirebaseAuth.getInstance()
-        auth.createUserWithEmailAndPassword(email, password).addOnSuccessListener {
-            it.user?.updateProfile(UserProfileChangeRequest.Builder().setDisplayName(name).build())
-            //val users = Firebase.database.reference.child("Users")
-            //users.child(it.user?.uid.toString()).setValue(User(it.user?.uid.toString(), it.user?.displayName.toString(), "")).addOnSuccessListener {
-            val users = Firebase.firestore.collection("Users")
-            users.document(it.user?.uid.toString()).set(User(it.user?.uid.toString(), it.user?.displayName.toString(), "")).addOnSuccessListener {
-                viewState = SignUpReady("Successful registration")
-            }.addOnFailureListener {
-                viewState = NetworkError("Network error")
+        auth.createUserWithEmailAndPassword(email, password).addOnSuccessListener { it1 ->
+            it1.user?.updateProfile(UserProfileChangeRequest.Builder().setDisplayName(name).build())?.addOnSuccessListener {
+                val users = Firebase.firestore.collection("Users")
+                users.document(it1.user?.uid.toString())
+                    .set(User(it1.user?.uid.toString(), it1.user?.displayName.toString(), "")).addOnSuccessListener {
+                    viewState = SignUpReady("Successful registration")
+                }.addOnFailureListener {
+                    viewState = NetworkError(it.message.toString())
+                }
+            }?.addOnFailureListener {
+                viewState = NetworkError(it.message.toString())
             }
         }.addOnFailureListener {
-            viewState = NetworkError("Network error")
+            viewState = NetworkError(it.message.toString())
         }
     }
 }

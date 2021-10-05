@@ -7,6 +7,7 @@ import dagger.Module
 import dagger.multibindings.IntoMap
 import hu.bme.aut.chatify.navigation.BottomNavigationViewModel
 import hu.bme.aut.chatify.ui.chat.ChatViewModel
+import hu.bme.aut.chatify.ui.imageview.ImageViewViewModel
 import hu.bme.aut.chatify.ui.login.LoginViewModel
 import hu.bme.aut.chatify.ui.main.MainViewModel
 import hu.bme.aut.chatify.ui.people.PeopleViewModel
@@ -55,4 +56,9 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(ChatViewModel::class)
     abstract fun bindChatViewModel(chatViewModel: ChatViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ImageViewViewModel::class)
+    abstract fun bindImageViewViewModel(imageViewViewModel: ImageViewViewModel): ViewModel
 }

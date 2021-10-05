@@ -50,13 +50,8 @@ class LoginViewModel @Inject constructor(
                     database.collection("Users").document(Firebase.auth.currentUser?.uid.toString()).get().addOnSuccessListener {
                         if(it.data == null){
                             val currentUser = Firebase.auth.currentUser
-                            database.collection("Users").document(Firebase.auth.currentUser?.uid.toString()).set(
-                                //User(currentUser?.uid.toString(), currentUser?.displayName.toString(), currentUser?.photoUrl.toString())
-                                hashMapOf(
-                                        "id" to currentUser?.uid.toString(),
-                                        "name" to currentUser?.displayName.toString(),
-                                        "photoUrl" to currentUser?.photoUrl.toString()
-                                )
+                            database.collection("Users").document(Firebase.auth.currentUser?.uid.toString())
+                                .set(User(currentUser?.uid.toString(), currentUser?.displayName.toString(), currentUser?.photoUrl.toString())
                             ).addOnSuccessListener {
                                 viewState = LoginReady("Successful login")
                             }.addOnFailureListener {
@@ -88,7 +83,8 @@ class LoginViewModel @Inject constructor(
                     database.collection("Users").document(Firebase.auth.currentUser?.uid.toString()).get().addOnSuccessListener {
                         if(it.data == null){
                             val currentUser = Firebase.auth.currentUser
-                            database.collection("Users").document(Firebase.auth.currentUser?.uid.toString()).set(User(currentUser?.uid.toString(), currentUser?.displayName.toString(), currentUser?.photoUrl.toString())).addOnSuccessListener {
+                            database.collection("Users").document(Firebase.auth.currentUser?.uid.toString())
+                                .set(User(currentUser?.uid.toString(), currentUser?.displayName.toString(), currentUser?.photoUrl.toString())).addOnSuccessListener {
                                 viewState = LoginReady("Success")
                             }.addOnFailureListener {
                                 viewState = NetworkError("Error")
