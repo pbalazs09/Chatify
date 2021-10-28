@@ -13,11 +13,11 @@
         android:roundIcon="@mipmap/ic_logo_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Chatify">
-        <activity android:name=".navigation.BottomNavigationFragment"></activity>
+        <!--<activity android:name=".navigation.BottomNavigationFragment"></activity>
         <activity android:name=".BottomNavActivity" />
         <activity
             android:name=".BottomNavigationActivity"
-            android:label="@string/title_activity_bottom_navigation" />
+            android:label="@string/title_activity_bottom_navigation" />-->
         <activity android:name=".NavigationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,7 +25,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <service
+            android:name=".notification.NotificationService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />

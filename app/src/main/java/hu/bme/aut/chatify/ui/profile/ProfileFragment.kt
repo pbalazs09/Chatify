@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import com.squareup.picasso.Picasso
 import hu.bme.aut.chatify.R
 import hu.bme.aut.chatify.databinding.FragmentProfileBinding
@@ -53,7 +54,7 @@ class ProfileFragment : RainbowCakeFragment<ProfileViewState, ProfileViewModel>(
             AlertDialog.Builder(requireContext())
                 .setMessage(getString(R.string.delete_question))
                 .setPositiveButton(getString(R.string.yes)){ _: DialogInterface, _: Int ->
-                    viewModel.deleteProfile()
+                    viewModel.deleteProfile(requireContext())
                 }
                 .setNegativeButton(getString(R.string.no),null)
                 .show()
@@ -79,7 +80,7 @@ class ProfileFragment : RainbowCakeFragment<ProfileViewState, ProfileViewModel>(
         super.onActivityResult(requestCode, resultCode, data)
         val uri = data?.data
         if (uri != null) {
-            viewModel.setPhoto(uri)
+            viewModel.setPhoto(uri, requireContext())
         }
         /*if(requestCode == 1){
             val uri = data?.data
@@ -112,7 +113,9 @@ class ProfileFragment : RainbowCakeFragment<ProfileViewState, ProfileViewModel>(
             }
             is PhotoReady -> {
                 Toast.makeText(requireContext(), viewState.response, Toast.LENGTH_SHORT).show()
-                binding.civProfilePicture.setImageURI(viewState.uri)
+                if(Firebase.auth.currentUser?.photoUrl != null){
+                    Picasso.get().load(Firebase.auth.currentUser?.photoUrl).into(binding.civProfilePicture)
+                }
                 viewModel.init()
             }
             is NetworkError -> {

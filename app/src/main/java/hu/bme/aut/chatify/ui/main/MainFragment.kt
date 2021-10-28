@@ -1,6 +1,7 @@
 package hu.bme.aut.chatify.ui.main
 
 import android.os.Bundle
+import android.util.proto.ProtoOutputStream.makeToken
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,12 +19,14 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 import com.squareup.picasso.Picasso
 import hu.bme.aut.chatify.R
 import hu.bme.aut.chatify.adapter.ConversationsAdapter
 import hu.bme.aut.chatify.adapter.MessageAdapter
 import hu.bme.aut.chatify.adapter.PeopleAdapter
 import hu.bme.aut.chatify.databinding.FragmentMainBinding
+import hu.bme.aut.chatify.model.ClientToken
 import hu.bme.aut.chatify.model.Conversation
 import hu.bme.aut.chatify.model.Message
 import hu.bme.aut.chatify.model.User
@@ -60,6 +63,29 @@ class MainFragment : RainbowCakeFragment<MainViewState, MainViewModel>(), Conver
         binding.tvDisplayName.text = currentUser?.displayName
         if(currentUser?.photoUrl != null){
             Picasso.get().load(currentUser.photoUrl).into(binding.civProfilePicture)
+        }
+        makeToken(currentUser?.uid.toString())
+    }
+
+    private fun makeToken(uid: String) {
+        Firebase.messaging.token.addOnSuccessListener { token ->
+            if(token != null){
+                Firebase.firestore.collection("ClientTokens").document(uid).get().addOnSuccessListener {
+                    if(it.exists()){
+                        val clientToken = ClientToken(it.data?.get("tokens") as HashMap<String, Boolean>)
+                        if(!clientToken.tokens.keys.contains(token)){
+                            Firebase.firestore.collection("ClientTokens").document(uid).update("tokens.$token", true)
+                        }
+                    }
+                    else{
+                        Firebase.firestore.collection("ClientTokens").document(uid).set(
+                            ClientToken(
+                                hashMapOf(token to true)
+                            )
+                        )
+                    }
+                }
+            }
         }
     }
 

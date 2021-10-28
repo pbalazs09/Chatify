@@ -6,7 +6,9 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
+    <color name="gray">#D1D1D1</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="blue">#0000FF</color>
     <color name="red">#FF0000</color>
     <color name="app_color">#1DB954</color>
     <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">#1DB954</color>
