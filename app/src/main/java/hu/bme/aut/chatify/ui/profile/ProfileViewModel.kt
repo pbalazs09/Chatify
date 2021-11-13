@@ -33,29 +33,38 @@ class ProfileViewModel @Inject constructor(
             val conversations = Firebase.firestore.collection("Conversations")
             users.document(currentUser.uid).delete()
             conversations.get().addOnSuccessListener {
-                for(conversation in it.documents){
-                    val participants = conversation.data?.get("participants") as HashMap<*, *>
-                    if(participants.contains(currentUser.uid)){
-                        val messages = Firebase.firestore
-                            .collection("Conversations")
-                            .document(conversation.data?.get("id").toString())
-                            .collection("Messages")
-                        messages.get().addOnSuccessListener { it1 ->
-                            for(message in it1.documents){
-                                Firebase.storage.getReference("Images").child(message.data?.get("imageName").toString()).delete()
-                                val messageId = message.id
-                                messages.document(messageId).delete()
+                if(it.documents.isNotEmpty()) {
+                    for (conversation in it.documents) {
+                        val participants = conversation.data?.get("participants") as HashMap<*, *>
+                        if (participants.contains(currentUser.uid)) {
+                            val messages = Firebase.firestore
+                                    .collection("Conversations")
+                                    .document(conversation.data?.get("id").toString())
+                                    .collection("Messages")
+                            messages.get().addOnSuccessListener { it1 ->
+                                for (message in it1.documents) {
+                                    if (message.data?.get("imageName").toString().isNotEmpty()) {
+                                        Firebase.storage.getReference("Images").child(message.data?.get("imageName").toString()).delete()
+                                    }
+                                    val messageId = message.id
+                                    messages.document(messageId).delete()
+                                }
+                                conversations.document(conversation.data?.get("id").toString()).delete()
+                            }.addOnFailureListener { it2 ->
+                                viewState = NetworkError("Error")
+                                Toast.makeText(requireContext, it2.message, Toast.LENGTH_SHORT).show()
                             }
-                            conversations.document(conversation.data?.get("id").toString()).delete()
-                            currentUser.delete()
-                            viewState = ProfileReady("Profile deleted")
-                        }.addOnFailureListener { it2 ->
-                            Toast.makeText(requireContext, it2.message, Toast.LENGTH_SHORT).show()
                         }
                     }
+                    currentUser.delete()
+                    viewState = ProfileReady("Profile deleted")
+                }
+                else{
+                    currentUser.delete()
+                    viewState = ProfileReady("Profile deleted")
                 }
             }.addOnFailureListener {
-                Toast.makeText(requireContext, it.message, Toast.LENGTH_SHORT).show()
+                viewState = NetworkError("Error")
             }
         }
         else{

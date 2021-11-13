@@ -117,7 +117,7 @@ class MessageAdapter(
                             "Red" -> {
                                 val shapeAppearanceModel = ShapeAppearanceModel()
                                     .toBuilder()
-                                    .setAllCorners(CornerFamily.ROUNDED, radius.toFloat())
+                                    .setAllCorners(CornerFamily.ROUNDED, 70f)
                                     .build()
                                 val shapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
                                 shapeDrawable.fillColor =
@@ -127,7 +127,7 @@ class MessageAdapter(
                             "Blue" -> {
                                 val shapeAppearanceModel = ShapeAppearanceModel()
                                     .toBuilder()
-                                    .setAllCorners(CornerFamily.ROUNDED, radius.toFloat())
+                                    .setAllCorners(CornerFamily.ROUNDED, 70f)
                                     .build()
                                 val shapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
                                 shapeDrawable.fillColor =
@@ -137,7 +137,7 @@ class MessageAdapter(
                             "Green" -> {
                                 val shapeAppearanceModel = ShapeAppearanceModel()
                                     .toBuilder()
-                                    .setAllCorners(CornerFamily.ROUNDED, radius.toFloat())
+                                    .setAllCorners(CornerFamily.ROUNDED, 70f)
                                     .build()
                                 val shapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
                                 shapeDrawable.fillColor =
@@ -150,7 +150,7 @@ class MessageAdapter(
                 else{
                     val shapeAppearanceModel = ShapeAppearanceModel()
                         .toBuilder()
-                        .setAllCorners(CornerFamily.ROUNDED, radius.toFloat())
+                        .setAllCorners(CornerFamily.ROUNDED, 70f)
                         .build()
                     val shapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
                     shapeDrawable.fillColor =

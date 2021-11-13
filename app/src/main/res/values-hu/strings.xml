@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Chatify</string>
+    <string name="email">Email</string>
+    <string name="password">Jelszó</string>
+    <string name="sign_in">Bejelentkezés</string>
+    <string name="sign_in_with_google">Bejelentkezés Google-lel</string>
+    <string name="registration">Regisztráció</string>
+    <string name="name">Név</string>
+    <string name="confirm_email">Email megerősítése</string>
+    <string name="confirm_password">Jelszó megerősítése</string>
+    <string name="empty_name">A név nem lehet üres!</string>
+    <string name="empty_email">Az email nem lehet üres!</string>
+    <string name="empty_password">A jelszó nem lehet üres!</string>
+    <string name="emails_not_matches">Az email-ek nem egyeznek</string>
+    <string name="passwords_not_matches">A jelszavak nem egyeznek</string>
+    <string name="reset_pw">Jelszó frissítése</string>
+    <string name="facebook_app_id">631145158249510</string>
+    <string name="fb_login_protocol_scheme">fb631145158249510</string>
+    <string name="delete_profile">Profil törlése</string>
+    <string name="change_picture">Fotó cseréje</string>
+    <string name="sign_out">Kijelentkezés</string>
+    <string name="delete_question">A profilod végleg törlődik. Biztosan törölni szeretnéd?</string>
+    <string name="no">Nem</string>
+    <string name="yes">Igen</string>
+    <string name="signout_question">Biztosan ki szeretnél jelentkezni?</string>
+    <string name="chats">Csevegések</string>
+    <string name="people">Emberek</string>
+    <string name="title_activity_bottom_navigation">MainActivity</string>
+    <string name="title_home">Otthon</string>
+    <string name="title_dashboard">Irányítópult</string>
+    <string name="title_notifications">Értesítések</string>
+    <string name="forgot_your_password">Elfelejtetted a jelszavad?</string>
+    <string name="if_you_don_t_have_account_just_sign_up">Ha nincs felhasználód, regisztrálj</string>
+    <string name="choose">Válassz</string>
+    <string name="cancel">Mégse</string>
+    <string name="camera">Kamera</string>
+    <string name="image">Kép</string>
+    <string name="gallery">Galéria</string>
+    <string-array name="Colors">
+        <item>Piros</item>
+        <item>Kék</item>
+        <item>Zöld</item>
+    </string-array>
+</resources>

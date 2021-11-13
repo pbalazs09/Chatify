@@ -29,6 +29,13 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="forgot_your_password">Forgot your password?</string>
+    <string name="if_you_don_t_have_account_just_sign_up">If you do not have account, just sign up</string>
+    <string name="choose">Choose</string>
+    <string name="cancel">Cancel</string>
+    <string name="camera">Camera</string>
+    <string name="image">Image</string>
+    <string name="gallery">Gallery</string>
     <string-array name="Colors">
         <item>Red</item>
         <item>Blue</item>

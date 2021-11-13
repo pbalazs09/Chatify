@@ -55,7 +55,12 @@ class ConversationsAdapter(options: FirestoreRecyclerOptions<Conversation>, priv
             holder.lastMessage.text = model.lastMessage
         }
         val simpleDateFormat = SimpleDateFormat("HH:mm")
-        holder.lastMessageTime.text = simpleDateFormat.format(model.lastMessageTime)
+        if(holder.lastMessage.length() != 0){
+            holder.lastMessageTime.text = simpleDateFormat.format(model.lastMessageTime)
+        }
+        else{
+            holder.lastMessageTime.text = ""
+        }
         for(userId in model.participants.keys){
             if(userId != Firebase.auth.currentUser?.uid.toString()){
                 Firebase.firestore.collection("Users").document(userId).get().addOnSuccessListener {

@@ -1,8 +1,10 @@
 package hu.bme.aut.chatify.ui.chat
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.webkit.MimeTypeMap
+import androidx.core.graphics.drawable.toIcon
 import androidx.lifecycle.viewModelScope
 import co.zsmb.rainbowcake.base.RainbowCakeViewModel
 import com.android.volley.DefaultRetryPolicy
@@ -14,6 +16,7 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import com.squareup.picasso.Picasso
 import hu.bme.aut.chatify.model.ClientToken
 import hu.bme.aut.chatify.model.Conversation
 import hu.bme.aut.chatify.model.Message
@@ -41,10 +44,10 @@ class ChatViewModel @Inject constructor(
                 val newMessage = conversations.document(id).collection("Messages").document()
                 //conversations.document(id).collection("Messages").add(Message(id, sender, message, Date().time, false)).addOnSuccessListener {
                 conversations.document(id).collection("Messages").document(newMessage.id).set(Message(newMessage.id, id, sender, message, Date().time, false)).addOnSuccessListener {
-                    conversations.document(id).collection("Messages").get().addOnSuccessListener {
+                    conversations.document(id).collection("Messages").get().addOnSuccessListener { it1 ->
                         conversations.document(id).update("lastMessage", message)
                         conversations.document(id).update("lastMessageTime", Date().time)
-                        if (it.documents.size < 2) {
+                        if (it1.documents.size < 2) {
                             viewState = InitChat("Init chat")
                         } else {
                             viewState = MessageSent("Message sent")
@@ -59,14 +62,14 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun getReceiverTokens(receiver: String, id: String, message: String, requireContext: Context) = viewModelScope.launch{
+    fun getReceiverTokens(sender: String, receiver: String, message: String, requireContext: Context) = viewModelScope.launch{
         Firebase.firestore.collection("ClientTokens").document(receiver).addSnapshotListener { snapshot, error ->
             if(snapshot != null && snapshot.exists()){
                 val clientToken = ClientToken(snapshot.data?.get("tokens") as HashMap<String, Boolean>)
                 val toReceiver = JSONObject()
                 val data = JSONObject()
-                data.put("conversationId", id)
                 data.put("receiver", receiver)
+                data.put("sender", sender)
                 data.put("message", message)
                 for (token in clientToken.tokens.keys){
                     toReceiver.put("to", token)
@@ -143,7 +146,7 @@ class ChatViewModel @Inject constructor(
                 Firebase.auth.currentUser?.uid.toString() to true,
                 userId to true
         )
-        conversations.document(newConversation.id).set(Conversation(newConversation.id, "", -1, "#1DB954", participants)).addOnSuccessListener {
+        conversations.document(newConversation.id).set(Conversation(newConversation.id, "", -1, "Green", participants)).addOnSuccessListener {
             viewState = ChatReady(newConversation.id)
         }.addOnFailureListener {
             viewState = NetworkError("Error")
@@ -195,11 +198,16 @@ class ChatViewModel @Inject constructor(
         Firebase.firestore.collection("Conversations")
                 .whereEqualTo("participants.$sender", true)
                 .whereEqualTo("participants.$receiver", true).get().addOnSuccessListener {
-                    val id = it.documents[0].data?.get("id")
-                    Firebase.firestore.collection("Conversations").document(id.toString()).update("chatColor", color).addOnSuccessListener {
-                        viewState = ThemeApplied("Theme applied")
-                    }.addOnFailureListener { it1 ->
-                        viewState = NetworkError(it1.message.toString())
+                    if(it.documents.isNotEmpty()){
+                        val id = it.documents[0].data?.get("id")
+                        Firebase.firestore.collection("Conversations").document(id.toString()).update("chatColor", color).addOnSuccessListener {
+                            viewState = ThemeApplied("Theme applied")
+                        }.addOnFailureListener { it1 ->
+                            viewState = NetworkError(it1.message.toString())
+                        }
+                    }
+                    else{
+                        viewState = Initialize
                     }
                 }
     }

@@ -3,10 +3,10 @@
     <item
         android:id="@+id/nav_chat"
         android:icon="@drawable/ic_chat"
-        android:title="Chats"/>
+        android:title="@string/chats"/>
 
     <item
         android:id="@+id/nav_people"
         android:icon="@drawable/ic_user"
-        android:title="People"/>
+        android:title="@string/people"/>
 </menu>

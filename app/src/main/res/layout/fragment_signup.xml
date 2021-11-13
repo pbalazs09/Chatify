@@ -6,16 +6,17 @@
     android:id="@+id/signUpRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorOnPrimary"
+    android:background="?android:colorBackground"
     tools:context=".ui.signup.SignUpFragment">
 
     <ImageView
         android:id="@+id/ivLogo"
         android:layout_width="match_parent"
-        android:layout_height="170dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="20dp"
         android:scaleType="fitCenter"
         android:padding="15dp"
-        android:src="@mipmap/ic_logo_round"
+        android:src="@drawable/ic_chat"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
@@ -27,6 +28,7 @@
         android:textColorHint="@color/app_color"
         android:textColor="?android:textColorSecondary"
         android:hint="@string/name"
+        android:layout_marginTop="20dp"
         app:boxStrokeColor="@color/app_color"
         app:boxStrokeWidth="2dp"
         app:boxBackgroundColor="?colorOnPrimary"
@@ -48,6 +50,7 @@
             android:layout_height="wrap_content"
             android:textColorHighlight="#8FC391"
             android:inputType="textCapWords"
+            android:backgroundTint="?android:colorBackground"
             android:paddingStart="25dp"/>
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -81,6 +84,7 @@
             android:layout_height="wrap_content"
             android:textColorHighlight="#8FC391"
             android:inputType="textEmailAddress"
+            android:backgroundTint="?android:colorBackground"
             android:paddingStart="25dp"/>
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -115,6 +119,7 @@
             android:textColorHint="@color/app_color"
             android:textColorHighlight="#8FC391"
             android:inputType="textEmailAddress"
+            android:backgroundTint="?android:colorBackground"
             android:paddingStart="25dp"/>
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -148,6 +153,7 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:textColorHighlight="#8FC391"
+            android:backgroundTint="?android:colorBackground"
             android:paddingStart="25dp" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -183,6 +189,7 @@
             android:layout_height="wrap_content"
             android:textColorHighlight="#8FC391"
             android:inputType="textPassword"
+            android:backgroundTint="?android:colorBackground"
             android:paddingStart="25dp"/>
 
     </com.google.android.material.textfield.TextInputLayout>

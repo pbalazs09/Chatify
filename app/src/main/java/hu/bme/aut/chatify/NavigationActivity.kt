@@ -5,6 +5,7 @@ import co.zsmb.rainbowcake.navigation.SimpleNavActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import hu.bme.aut.chatify.navigation.BottomNavigationFragment
+import hu.bme.aut.chatify.ui.chat.ChatFragment
 import hu.bme.aut.chatify.ui.login.LoginFragment
 import hu.bme.aut.chatify.ui.main.MainFragment
 import hu.bme.aut.chatify.ui.people.PeopleFragment
@@ -14,7 +15,13 @@ class NavigationActivity : SimpleNavActivity(){
         super.onCreate(savedInstanceState)
         val auth = FirebaseAuth.getInstance()
         if(auth.currentUser != null){
-            navigator.setStack(BottomNavigationFragment())
+            val sender = intent.getStringExtra("sender")
+            if(sender.isNullOrEmpty()){
+                navigator.setStack(BottomNavigationFragment())
+            }
+            else{
+                navigator.setStack(BottomNavigationFragment(), ChatFragment(sender))
+            }
         }
         else{
             navigator.setStack(LoginFragment())

@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?android:colorBackground">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/loginRoot"
         android:layout_width="match_parent"
@@ -14,10 +15,12 @@
         <ImageView
             android:id="@+id/ivLogo"
             android:layout_width="match_parent"
-            android:layout_height="170dp"
-            android:scaleType="fitCenter"
+            android:layout_height="150dp"
             android:padding="15dp"
-            android:src="@mipmap/ic_logo_round"
+            android:layout_marginTop="20dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_chat"
+            app:layout_constraintTop_toTopOf="parent"
             tools:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -25,7 +28,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="60dp"
             android:layout_marginHorizontal="30dp"
             android:hint="@string/email"
             android:textColorHint="@color/app_color"
@@ -48,6 +51,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
+                android:backgroundTint="?android:colorBackground"
                 android:paddingStart="25dp"
                 android:textColorHighlight="#8FC391" />
 
@@ -83,6 +87,7 @@
                 android:inputType="textPassword"
                 android:paddingStart="25dp"
                 android:textColorHighlight="#8FC391"
+                android:backgroundTint="?android:colorBackground"
                 app:layout_constraintTop_toBottomOf="@+id/tilUsername" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -108,10 +113,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:text="Forgot your password?"
+            android:text="@string/forgot_your_password"
             android:textColor="#357CFF"
             android:textSize="16dp"
-            app:layout_constraintBottom_toTopOf="@+id/btnGoogle"
+            app:layout_constraintBottom_toTopOf="@+id/btnGoogleLogin"
             app:layout_constraintEnd_toEndOf="@+id/btnLogin"
             app:layout_constraintStart_toStartOf="@+id/btnLogin"
             app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
@@ -141,6 +146,33 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btnLogin"
             app:strokeColor="@color/app_color"
+            app:strokeWidth="2dp"
+            android:visibility="gone"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGoogleLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="?android:colorBackground"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            android:paddingVertical="10dp"
+            android:textColor="?android:textColorPrimary"
+            app:cornerRadius="50dp"
+            android:text="@string/sign_in_with_google"
+            android:textSize="16sp"
+            app:icon="@drawable/ic_google"
+            app:iconTint="@color/white"
+            app:iconTintMode="multiply"
+            app:layout_constraintEnd_toEndOf="@+id/btnLogin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnForgot"
+            app:strokeColor="@color/app_color"
             app:strokeWidth="2dp" />
 
         <com.google.android.material.button.MaterialButton
@@ -168,37 +200,41 @@
             app:layout_constraintStart_toStartOf="@+id/btnLogin"
             app:layout_constraintTop_toBottomOf="@+id/btnLogin"
             app:strokeColor="@color/app_color"
-            app:strokeWidth="2dp" />
+            app:strokeWidth="2dp"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/tvSignUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="If you don't have account, just sign up"
+            android:text="@string/if_you_don_t_have_account_just_sign_up"
             android:textSize="18dp"
             app:layout_constraintBottom_toTopOf="@+id/btnRegister"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnGoogle"
+            app:layout_constraintTop_toBottomOf="@+id/btnGoogleLogin"
             app:layout_constraintVertical_bias="0.7" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRegister"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="120dp"
+            android:paddingHorizontal="30dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="?android:colorBackground"
             android:paddingVertical="10dp"
-            android:backgroundTint="?colorOnPrimary"
-            android:textColor="?android:textColorPrimary"
-            app:strokeWidth="2dp"
-            app:strokeColor="@color/app_color"
             android:text="@string/registration"
+            android:textColor="?android:textColorPrimary"
             android:textSize="18sp"
             app:cornerRadius="30dp"
             app:elevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnGoogle"
-            app:layout_constraintVertical_bias="0.7" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnGoogleLogin"
+            app:layout_constraintVertical_bias="0.7"
+            app:strokeColor="@color/app_color"
+            app:strokeWidth="2dp" />
 
         <ProgressBar
             android:id="@+id/pbLogin"
@@ -207,10 +243,10 @@
             android:layout_height="wrap_content"
             android:indeterminateTint="@color/app_color"
             android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@+id/tvSignUp"
+            app:layout_constraintBottom_toTopOf="@+id/tilEmail"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnFacebook" />
+            app:layout_constraintTop_toBottomOf="@+id/ivLogo" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
