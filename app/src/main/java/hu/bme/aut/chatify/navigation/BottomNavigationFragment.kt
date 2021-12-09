@@ -1,18 +1,16 @@
 package hu.bme.aut.chatify.navigation
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.FrameLayout
 import co.zsmb.rainbowcake.base.RainbowCakeFragment
 import co.zsmb.rainbowcake.dagger.getViewModelFromFactory
 import co.zsmb.rainbowcake.extensions.exhaustive
-import co.zsmb.rainbowcake.navigation.navigator
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import hu.bme.aut.chatify.R
 import hu.bme.aut.chatify.ui.main.MainFragment
 import hu.bme.aut.chatify.ui.people.PeopleFragment
 
+@Suppress("DEPRECATION")
 class BottomNavigationFragment : RainbowCakeFragment<BottomNavigationViewState, BottomNavigationViewModel>() {
 
     private var lastSelected: Int = R.id.nav_chat

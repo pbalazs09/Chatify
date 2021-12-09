@@ -1,11 +1,13 @@
 package hu.bme.aut.chatify.adapter
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.Context
+import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.view.menu.ActionMenuItemView
 import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
@@ -16,11 +18,9 @@ import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import hu.bme.aut.chatify.R
 import hu.bme.aut.chatify.model.Conversation
-import hu.bme.aut.chatify.model.Message
-import hu.bme.aut.chatify.model.User
 import java.text.SimpleDateFormat
 
-class ConversationsAdapter(options: FirestoreRecyclerOptions<Conversation>, private val listener: ItemClickListener) : FirestoreRecyclerAdapter<Conversation, ConversationsAdapter.ConversationsViewHolder>(options) {
+class ConversationsAdapter(options: FirestoreRecyclerOptions<Conversation>, private val listener: ItemClickListener, private val context: Context) : FirestoreRecyclerAdapter<Conversation, ConversationsAdapter.ConversationsViewHolder>(options) {
 
     inner class ConversationsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         var conversation: Conversation? = null
@@ -45,8 +45,18 @@ class ConversationsAdapter(options: FirestoreRecyclerOptions<Conversation>, priv
         return ConversationsViewHolder(itemView)
     }
 
-    @SuppressLint("SimpleDateFormat")
+    @SuppressLint("SimpleDateFormat", "SetTextI18n")
     override fun onBindViewHolder(holder: ConversationsViewHolder, position: Int, model: Conversation) {
+        holder.itemView.setOnLongClickListener {
+            AlertDialog.Builder(context)
+                    .setMessage("Would you like to delete this conversation?")
+                    .setPositiveButton("Yes"){ _: DialogInterface, _: Int ->
+                        Firebase.firestore.collection("Conversations").document(model.id).delete()
+                    }
+                    .setNegativeButton("No", null)
+                    .show()
+            true
+        }
         holder.conversation = model
         if(model.lastMessage.length > 25){
             holder.lastMessage.text = model.lastMessage.substring(0, 22) + "..."

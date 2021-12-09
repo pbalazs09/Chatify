@@ -15,26 +15,21 @@ class NavigationActivity : SimpleNavActivity(){
         super.onCreate(savedInstanceState)
         val auth = FirebaseAuth.getInstance()
         if(auth.currentUser != null){
-            val sender = intent.getStringExtra("sender")
+            val sender = intent.data?.pathSegments?.get(0)
             if(sender.isNullOrEmpty()){
                 navigator.setStack(BottomNavigationFragment())
             }
             else{
-                navigator.setStack(BottomNavigationFragment(), ChatFragment(sender))
+                if(intent.data?.pathSegments?.size!! < 2){
+                    navigator.setStack(BottomNavigationFragment(), ChatFragment(sender))
+                }
+                else{
+                    navigator.setStack(BottomNavigationFragment(), ChatFragment(sender, true))
+                }
             }
         }
         else{
             navigator.setStack(LoginFragment())
         }
-        //val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-        //bottomNav.setOnNavigationItemSelectedListener(navListener)
     }
-    private val navListener =
-        BottomNavigationView.OnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_chat -> navigator.add(MainFragment())
-                R.id.nav_people -> navigator.add(PeopleFragment())
-            }
-            true
-        }
 }

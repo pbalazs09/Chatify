@@ -61,15 +61,10 @@ class ProfileFragment : RainbowCakeFragment<ProfileViewState, ProfileViewModel>(
         }
         binding.btnChangeProfilePicture.setOnClickListener{
             ImagePicker.with(this)
-                .crop(1f, 1f)	    			//Crop image(Optional), Check Customization for more option
-                .compress(1024)			//Final image size will be less than 1 MB(Optional)
-                .maxResultSize(128, 128)	//Final image resolution will be less than 1080 x 1080(Optional)
+                .crop(1f, 1f)
+                .compress(1024)
                 .galleryOnly()
                 .start()
-            //val intent = Intent()
-            //intent.type = "image/*"
-            //intent.action = Intent.ACTION_GET_CONTENT
-            //startActivityForResult(Intent.createChooser(intent, "Choose a photo"), PICK_IMAGE)
         }
         if(Firebase.auth.currentUser?.photoUrl != null){
             Picasso.get().load(Firebase.auth.currentUser?.photoUrl).into(binding.civProfilePicture)
@@ -82,12 +77,6 @@ class ProfileFragment : RainbowCakeFragment<ProfileViewState, ProfileViewModel>(
         if (uri != null) {
             viewModel.setPhoto(uri, requireContext())
         }
-        /*if(requestCode == 1){
-            val uri = data?.data
-            if (uri != null) {
-                viewModel.setPhoto(uri)
-            }
-        }*/
     }
 
     override fun getViewResource(): Int = R.layout.fragment_profile

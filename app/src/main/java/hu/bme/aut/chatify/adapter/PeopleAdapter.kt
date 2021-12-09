@@ -7,20 +7,17 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import hu.bme.aut.chatify.R
-import hu.bme.aut.chatify.model.Conversation
 import hu.bme.aut.chatify.model.User
-import hu.bme.aut.chatify.ui.people.PeopleFragment
 
 class PeopleAdapter(options: FirestoreRecyclerOptions<User>, private val listener: ItemClickListener) : FirestoreRecyclerAdapter<User, PeopleAdapter.PeopleViewHolder>(options) {
 
     inner class PeopleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
         View.OnClickListener {
         var user: User? = null
-        var partner = itemView.findViewById<TextView>(R.id.tvPartner)
+        var partner: TextView = itemView.findViewById(R.id.tvPartner)
         var civ: CircleImageView = itemView.findViewById(R.id.circleImageView)
         init {
             itemView.setOnClickListener(this)
@@ -39,7 +36,7 @@ class PeopleAdapter(options: FirestoreRecyclerOptions<User>, private val listene
     override fun onBindViewHolder(holder: PeopleViewHolder, position: Int, model: User) {
         holder.user = model
         holder.partner.text = model.name
-        if(!model.photoUrl.isNullOrEmpty()){
+        if(model.photoUrl.isNotEmpty()){
             Picasso.get().load(model.photoUrl).into(holder.civ)
         }
         /*for(userId in model.participants){

@@ -14,10 +14,9 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.Icon
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.toIcon
+import androidx.core.net.toUri
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -28,6 +27,7 @@ import hu.bme.aut.chatify.NavigationActivity
 import hu.bme.aut.chatify.R
 
 
+@Suppress("NAME_SHADOWING", "DEPRECATION")
 class NotificationService : FirebaseMessagingService() {
 
     companion object{
@@ -46,11 +46,10 @@ class NotificationService : FirebaseMessagingService() {
         Firebase.firestore.collection("ClientTokens").document(uid).update("tokens.$token", true)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
         if(message.data.isNotEmpty()){
-            Log.d("Notif", "Notif")
             val data = message.data
             val receiver = data["receiver"].toString()
             val sender = data["sender"].toString()
@@ -103,11 +102,11 @@ class NotificationService : FirebaseMessagingService() {
         return result
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.Q)
     fun updateShortcuts(sender: String, senderName: String, bitmap: Bitmap?) {
         val shortcut = shortcuts.find { it.id == sender }
         val person = Person.Builder()
-        var icon: Icon? = null
+        val icon: Icon?
         val scut = ShortcutInfo.Builder(this, sender)
         if(bitmap != null){
             icon = Icon.createWithAdaptiveBitmap(convertBitmapToAdaptive(bitmap, this))
@@ -118,8 +117,7 @@ class NotificationService : FirebaseMessagingService() {
             person.setName(senderName).setIcon(Icon.createWithResource(this, R.drawable.ic_account))
             scut.setIcon(Icon.createWithResource(this, R.drawable.ic_account))
         }
-        val intent = Intent(this, NavigationActivity::class.java).setAction(Intent.ACTION_VIEW)
-        intent.putExtra("sender", sender)
+        val intent = Intent(this, NavigationActivity::class.java).setAction(Intent.ACTION_VIEW).setData(sender.toUri())
         if(shortcut == null){
             scut.setLocusId(LocusId(sender))
                 .setActivity(ComponentName(this, NavigationActivity::class.java))
@@ -130,11 +128,7 @@ class NotificationService : FirebaseMessagingService() {
                 .setPerson(person.build())
             shortcuts.add(scut.build())
         }
-        // Create a dynamic shortcut for each of the contacts.
-        // The same shortcut ID will be used when we show a bubble notification.
-        // Move the important contact to the front of the shortcut list.
         shortcuts = ArrayList(shortcuts.sortedByDescending { it.id == sender })
-        // Truncate the list if we can't show all of our contacts.
         val maxCount = shortcutManager.maxShortcutCountPerActivity
         if (shortcuts.size > maxCount) {
             shortcuts = ArrayList(shortcuts.take(maxCount))
@@ -142,10 +136,9 @@ class NotificationService : FirebaseMessagingService() {
         shortcutManager.addDynamicShortcuts(shortcuts)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun getBubble(senderName: String, senderIcon: Bitmap?, message: String, sender: String) : Notification {
-        val target = Intent(this, NavigationActivity::class.java).setAction(Intent.ACTION_VIEW)
-        target.putExtra("sender", sender)
+        val target = Intent(this, NavigationActivity::class.java).setAction(Intent.ACTION_VIEW).setData("$sender/bubble".toUri())
         val pendingIntent = PendingIntent.getActivity(
             this,
             REQUEST_BUBBLE,
@@ -170,11 +163,9 @@ class NotificationService : FirebaseMessagingService() {
                         )
                     )
                         .setDesiredHeight(this.resources.getDimensionPixelSize(R.dimen.bubble_height))
-                        //.setAutoExpandBubble(true)
-                        //.setSuppressNotification(true)
                         .build()
                 )
-                .setContentTitle("Teszt")
+                .setContentTitle(senderName)
                 .setSmallIcon(R.drawable.ic_chat)
                 .setCategory(Notification.CATEGORY_MESSAGE)
                 .setShortcutId(sender)
@@ -186,8 +177,8 @@ class NotificationService : FirebaseMessagingService() {
                         this,
                         REQUEST_CONTENT,
                         Intent(this, NavigationActivity::class.java)
-                            .setAction(Intent.ACTION_VIEW),
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                            .setAction(Intent.ACTION_VIEW).setData(sender.toUri()),
+                        PendingIntent.FLAG_ONE_SHOT
                     )
                 )
                 .setStyle(Notification.MessagingStyle(you).apply {
@@ -198,17 +189,18 @@ class NotificationService : FirebaseMessagingService() {
         return notification
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun getPush(senderName: String, senderIcon: Bitmap?, message: String, sender: String) : Notification {
-        val person = Person.Builder().setName(senderName).setIcon(
-            Icon.createWithResource(
-                this,
-                R.drawable.ic_chat
-            )
-        ).build()
-        val user = Person.Builder().setName("You").build()
-        val notificationIntent = Intent(this, NavigationActivity::class.java)
-        notificationIntent.putExtra("sender", sender)
+        val person = Person.Builder()
+        val you = Person.Builder().setName("You").build()
+        if(senderIcon != null){
+            person.setName(senderName).setIcon(Icon.createWithAdaptiveBitmap(convertBitmapToAdaptive(senderIcon, this)))
+        }
+        else{
+            person.setName(senderName).setIcon(Icon.createWithResource(this, R.drawable.ic_account))
+        }
+        person.setImportant(true)
+        val notificationIntent = Intent(this, NavigationActivity::class.java).setAction(Intent.ACTION_VIEW).setData(sender.toUri())
         val contentIntent = PendingIntent.getActivity(
             this,
             NOTIF_FOREGROUND_ID,
@@ -216,21 +208,32 @@ class NotificationService : FirebaseMessagingService() {
             PendingIntent.FLAG_ONE_SHOT
         )
 
-        return NotificationCompat.Builder(
+        val notification =  Notification.Builder(
             this, NOTIFICATION_CHANNEL_ID
         )
                 .setContentTitle(senderName)
                 .setContentText(message)
                 .setSmallIcon(R.drawable.ic_notif_icon)
                 .setVibrate(longArrayOf(1000, 2000, 1000))
-                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setContentIntent(contentIntent)
                 .setDefaults(0)
                 .setAutoCancel(true)
+                .setContentTitle("Teszt")
+                .setSmallIcon(R.drawable.ic_chat)
+                .setCategory(Notification.CATEGORY_MESSAGE)
+                .setShortcutId(sender)
+                .setLocusId(LocusId(sender))
+                .addPerson(person.build())
+                .setShowWhen(true)
+                .setStyle(Notification.MessagingStyle(you).apply {
+                    addMessage(Notification.MessagingStyle.Message(message, 0, person.build()))
+                })
                 .build()
+        updateShortcuts(sender, senderName, senderIcon)
+        return notification
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun getMyNotification(
         senderName: String,
         senderIcon: Bitmap?,
@@ -240,36 +243,15 @@ class NotificationService : FirebaseMessagingService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
         }
-        return getBubble(senderName, senderIcon, message, sender)
-        /*val person = Person.Builder()
-        if(senderIcon != null){
-            person.setName(senderName).setIcon(senderIcon.toIcon())
+        return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+            getBubble(senderName, senderIcon, message, sender)
         }
-        else{
-            person.setName(senderName)
+        else {
+            getPush(senderName, senderIcon, message, sender)
         }
-        val you = Person.Builder().setName("You").build()
-        val notificationIntent = Intent(this, NavigationActivity::class.java)
-        notificationIntent.putExtra("sender", sender)
-        val contentIntent = PendingIntent.getActivity(this,
-            NOTIF_FOREGROUND_ID,
-            notificationIntent,
-            PendingIntent.FLAG_ONE_SHOT)
-
-        return Notification.Builder(
-            this, NOTIFICATION_CHANNEL_ID)
-            .setContentTitle(senderName)
-            .setContentText(message)
-            .setSmallIcon(R.drawable.ic_notif_icon)
-            .setContentIntent(contentIntent)
-            .setAutoCancel(true)
-            .setStyle(Notification.MessagingStyle(you).apply {
-                addMessage(Notification.MessagingStyle.Message(message, 0, person.build()))
-            })
-            .build()*/
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun sendNotification(
         senderName: String,
         senderIcon: Bitmap?,

@@ -27,8 +27,6 @@ class ProfileViewModel @Inject constructor(
         viewState = Loading
         val currentUser = Firebase.auth.currentUser
         if(currentUser != null){
-            //val reference = Firebase.database.getReference("Users")
-            //reference.child(currentUser.uid).removeValue()
             val users = Firebase.firestore.collection("Users")
             val conversations = Firebase.firestore.collection("Conversations")
             users.document(currentUser.uid).delete()
@@ -87,7 +85,6 @@ class ProfileViewModel @Inject constructor(
                     ?.addOnSuccessListener {
                         val users = Firebase.firestore.collection("Users")
                         users.document(Firebase.auth.currentUser!!.uid).update("photoUrl", itUri.toString()).addOnSuccessListener {
-                            //Firebase.database.reference.child("Users").child(Firebase.auth.currentUser!!.uid).child("photoUrl").setValue(uri.toString()).addOnSuccessListener {
                             viewState = PhotoReady("Photo updated", itUri)
                         }.addOnFailureListener {
                             viewState = NetworkError("Error")

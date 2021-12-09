@@ -44,8 +44,6 @@ class LoginViewModel @Inject constructor(
         Firebase.auth.signInWithCredential(credential)
             .addOnCompleteListener(requireActivity) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    //val users = Firebase.database.reference.child("Users")
                     val database = Firebase.firestore
                     database.collection("Users").document(Firebase.auth.currentUser?.uid.toString()).get().addOnSuccessListener {
                         if(it.data == null){
@@ -78,7 +76,6 @@ class LoginViewModel @Inject constructor(
         Firebase.auth.signInWithCredential(credential)
             .addOnCompleteListener(requireActivity) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
                     val database = Firebase.firestore
                     database.collection("Users").document(Firebase.auth.currentUser?.uid.toString()).get().addOnSuccessListener {
                         if(it.data == null){

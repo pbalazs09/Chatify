@@ -95,7 +95,7 @@ class MainFragment : RainbowCakeFragment<MainViewState, MainViewModel>(), Conver
                 .collection("Conversations")
                 .whereEqualTo("participants.${Firebase.auth.currentUser?.uid.toString()}", true), Conversation::class.java)
             .build()
-        conversationsAdapter = ConversationsAdapter(options, this)
+        conversationsAdapter = ConversationsAdapter(options, this, requireContext())
         conversationRecyclerView = conversationList
         conversationRecyclerView.adapter = conversationsAdapter
         conversationRecyclerView.layoutManager = LinearLayoutManager(

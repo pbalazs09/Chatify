@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:background="#00ffffff"
         android:fitsSystemWindows="true"
-        android:paddingVertical="20dp"
+        android:paddingVertical="5dp"
         android:paddingHorizontal="8dp"
         app:elevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"

@@ -1,10 +1,8 @@
 package hu.bme.aut.chatify.ui.chat
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.net.Uri
 import android.webkit.MimeTypeMap
-import androidx.core.graphics.drawable.toIcon
 import androidx.lifecycle.viewModelScope
 import co.zsmb.rainbowcake.base.RainbowCakeViewModel
 import com.android.volley.DefaultRetryPolicy
@@ -16,7 +14,6 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import com.squareup.picasso.Picasso
 import hu.bme.aut.chatify.model.ClientToken
 import hu.bme.aut.chatify.model.Conversation
 import hu.bme.aut.chatify.model.Message
@@ -33,7 +30,7 @@ class ChatViewModel @Inject constructor(
         viewState = Initialize
     }
 
-    fun sendMessage(sender: String, receiver: String, message: String, requireContext: Context) = viewModelScope.launch{
+    fun sendMessage(sender: String, receiver: String, message: String) = viewModelScope.launch{
         val conversations = Firebase.firestore.collection("Conversations")
         val query = Firebase.firestore.collection("Conversations")
                 .whereEqualTo("participants.$sender", true)
@@ -42,7 +39,6 @@ class ChatViewModel @Inject constructor(
             if(!it.isEmpty) {
                 val id = it.documents[0].data?.get("id") as String
                 val newMessage = conversations.document(id).collection("Messages").document()
-                //conversations.document(id).collection("Messages").add(Message(id, sender, message, Date().time, false)).addOnSuccessListener {
                 conversations.document(id).collection("Messages").document(newMessage.id).set(Message(newMessage.id, id, sender, message, Date().time, false)).addOnSuccessListener {
                     conversations.document(id).collection("Messages").get().addOnSuccessListener { it1 ->
                         conversations.document(id).update("lastMessage", message)
@@ -63,7 +59,7 @@ class ChatViewModel @Inject constructor(
     }
 
     fun getReceiverTokens(sender: String, receiver: String, message: String, requireContext: Context) = viewModelScope.launch{
-        Firebase.firestore.collection("ClientTokens").document(receiver).addSnapshotListener { snapshot, error ->
+        Firebase.firestore.collection("ClientTokens").document(receiver).addSnapshotListener { snapshot, _ ->
             if(snapshot != null && snapshot.exists()){
                 val clientToken = ClientToken(snapshot.data?.get("tokens") as HashMap<String, Boolean>)
                 val toReceiver = JSONObject()
@@ -166,7 +162,6 @@ class ChatViewModel @Inject constructor(
                 val imageName = System.currentTimeMillis().toString() + "." + getFileExtension(uri, requireContext)
                 val storage = Firebase.storage.getReference("Images").child(imageName)
                 storage.putFile(uri).addOnSuccessListener {
-                    //conversations.document(id).collection("Messages").add(Message(id, sender, message, Date().time, true, imageName)).addOnSuccessListener {
                     conversations.document(id).collection("Messages").document(newMessage.id).set(Message(newMessage.id, id, sender, message, Date().time, true, imageName)).addOnSuccessListener {
                         conversations.document(id).collection("Messages").get().addOnSuccessListener {
                             conversations.document(id).update("lastMessage", "Sent a photo")

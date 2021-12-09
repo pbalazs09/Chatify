@@ -1,16 +1,12 @@
 package hu.bme.aut.chatify.ui.chat
 
-import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
-import android.graphics.Bitmap
 import android.graphics.Color
-import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
@@ -19,7 +15,6 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,13 +23,14 @@ import co.zsmb.rainbowcake.dagger.getViewModelFromFactory
 import co.zsmb.rainbowcake.extensions.exhaustive
 import co.zsmb.rainbowcake.navigation.navigator
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Picasso
-import com.squareup.picasso.Picasso.LoadedFrom
 import hu.bme.aut.chatify.R
+import hu.bme.aut.chatify.SpeedControlledLinearLayoutManager
 import hu.bme.aut.chatify.adapter.MessageAdapter
 import hu.bme.aut.chatify.databinding.FragmentChatBinding
 import hu.bme.aut.chatify.model.Message
@@ -45,12 +41,10 @@ import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
-import java.lang.Exception
 
 
-@Suppress("IMPLICIT_CAST_TO_ANY")
-class ChatFragment(private val userId: String) : RainbowCakeFragment<ChatViewState, ChatViewModel>(), MessageAdapter.ItemClickListener {
+@Suppress("IMPLICIT_CAST_TO_ANY", "DEPRECATION")
+class ChatFragment(private val userId: String, private val isBubble: Boolean = false) : RainbowCakeFragment<ChatViewState, ChatViewModel>(), MessageAdapter.ItemClickListener {
 
     private lateinit var binding: FragmentChatBinding
     private lateinit var messageAdapter: MessageAdapter
@@ -85,6 +79,9 @@ class ChatFragment(private val userId: String) : RainbowCakeFragment<ChatViewSta
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
+        if(isBubble){
+            binding.btnBack.visibility = View.GONE
+        }
         Firebase.firestore.collection("Users").document(userId).get().addOnSuccessListener {
             user = User(
                     it.data?.get("id").toString(), it.data?.get("name").toString(), it.data?.get(
@@ -109,8 +106,7 @@ class ChatFragment(private val userId: String) : RainbowCakeFragment<ChatViewSta
                 .whereEqualTo("participants.$sender", true)
                 .whereEqualTo("participants.$receiver", true).get().addOnSuccessListener {
                 if(it.documents.isNotEmpty()) {
-                    var chatColor = it.documents[0].data?.get("chatColor")?.toString()
-                    when (chatColor) {
+                    when (it.documents[0].data?.get("chatColor")?.toString()) {
                         "Red" -> {
                             binding.spinnerColors.setSelection(0)
                             binding.etTypeMessage.setBackgroundColor(Color.RED)
@@ -251,7 +247,7 @@ class ChatFragment(private val userId: String) : RainbowCakeFragment<ChatViewSta
                 binding.etTypeMessage.text!!.clear()
                 sender = Firebase.auth.currentUser?.uid.toString()
                 receiver = userId
-                viewModel.sendMessage(sender, receiver, message, requireContext())
+                viewModel.sendMessage(sender, receiver, message)
             }
         }
         binding.btnImage.setOnClickListener {
@@ -266,15 +262,10 @@ class ChatFragment(private val userId: String) : RainbowCakeFragment<ChatViewSta
                 startActivityForResult(Intent.createChooser(intent, "Choose a photo"), PICK_IMAGE)
             }
             mDialogView.btnCamera.setOnClickListener {
-                if (checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(
-                            arrayOf(Manifest.permission.CAMERA),
-                            MY_CAMERA_PERMISSION_CODE
-                    )
-                } else {
-                    val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                    startActivityForResult(cameraIntent, CAMERA_REQUEST)
-                }
+                ImagePicker.with(this)
+                        .compress(1024)
+                        .cameraOnly()
+                        .start()
             }
             val mBuilder = AlertDialog.Builder(requireContext()).setView(mDialogView).setTitle(
                     getString(
@@ -286,18 +277,6 @@ class ChatFragment(private val userId: String) : RainbowCakeFragment<ChatViewSta
         }
     }
 
-    private fun getImageUri(inImage: Bitmap): Uri {
-        val bytes = ByteArrayOutputStream()
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-        val path = MediaStore.Images.Media.insertImage(
-                requireContext().contentResolver,
-                inImage,
-                "Title",
-                null
-        )
-        return Uri.parse(path)
-    }
-
     override fun onRequestPermissionsResult(
             requestCode: Int,
             permissions: Array<out String>,
@@ -306,11 +285,8 @@ class ChatFragment(private val userId: String) : RainbowCakeFragment<ChatViewSta
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == MY_CAMERA_PERMISSION_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(requireContext(), "Camera permission granted", Toast.LENGTH_LONG).show()
                 val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 startActivityForResult(cameraIntent, CAMERA_REQUEST)
-            } else {
-                Toast.makeText(requireContext(), "Camera permission denied", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -321,7 +297,7 @@ class ChatFragment(private val userId: String) : RainbowCakeFragment<ChatViewSta
                 .whereEqualTo("participants.$receiver", true)
         query.get().addOnSuccessListener {
             if(!it.isEmpty){
-                var options = FirestoreRecyclerOptions.Builder<Message>()
+                val options = FirestoreRecyclerOptions.Builder<Message>()
                         .setQuery(
                                 Firebase.firestore
                                         .collection("Conversations")
@@ -333,7 +309,7 @@ class ChatFragment(private val userId: String) : RainbowCakeFragment<ChatViewSta
                 messageAdapter = MessageAdapter(options, this, requireContext())
                 chatRecyclerView = chatList
                 chatRecyclerView.adapter = messageAdapter
-                chatRecyclerView.layoutManager = LinearLayoutManager(
+                chatRecyclerView.layoutManager = SpeedControlledLinearLayoutManager(
                         requireContext(),
                         LinearLayoutManager.VERTICAL,
                         true
@@ -341,7 +317,6 @@ class ChatFragment(private val userId: String) : RainbowCakeFragment<ChatViewSta
                 if(this::messageAdapter.isInitialized){
                     messageAdapter.startListening()
                 }
-                binding.chatList.scrollToPosition(0)
             }
         }
     }
@@ -355,10 +330,14 @@ class ChatFragment(private val userId: String) : RainbowCakeFragment<ChatViewSta
                 viewModel.sendImage(uri, sender, receiver, requireContext())
             }
         }
-        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
+        else {
             mAlertDialog.dismiss()
-            val image = data?.extras?.get("data") as Bitmap
-            viewModel.sendImage(getImageUri(image), sender, receiver, requireContext())
+            val uri = data?.data
+            if (uri != null) {
+                viewModel.sendImage(uri, sender, receiver, requireContext())
+            }
+            /*val image = data?.extras?.get("data") as Bitmap
+            viewModel.sendImage(getImageUri(image), sender, receiver, requireContext())*/
         }
     }
 
@@ -401,10 +380,10 @@ class ChatFragment(private val userId: String) : RainbowCakeFragment<ChatViewSta
                         .whereEqualTo("participants.$receiver", true).get().addOnSuccessListener {
                             if (!it.isEmpty) {
                                 viewModel.getReceiverTokens(
-                                    sender,
-                                    receiver,
-                                    message,
-                                    requireContext()
+                                        sender,
+                                        receiver,
+                                        message,
+                                        requireContext()
                                 )
                             }
                         }
@@ -426,7 +405,6 @@ class ChatFragment(private val userId: String) : RainbowCakeFragment<ChatViewSta
             }
 
             is ChatReady -> {
-                binding.chatList.scrollToPosition(0)
                 viewModel.init()
             }
             is InitChat -> {
@@ -443,7 +421,6 @@ class ChatFragment(private val userId: String) : RainbowCakeFragment<ChatViewSta
                                 )
                             }
                         }
-                binding.chatList.scrollToPosition(0)
                 viewModel.init()
             }
             is NetworkError -> {
@@ -454,5 +431,13 @@ class ChatFragment(private val userId: String) : RainbowCakeFragment<ChatViewSta
 
     override fun onItemClicked(imageName: String) {
         navigator?.add(ImageViewFragment(imageName))
+    }
+
+    override fun onMessageReceived() {
+        lifecycleScope.launch {
+            withContext(Dispatchers.Main) {
+                binding.chatList.smoothScrollToPosition(0)
+            }
+        }
     }
 }

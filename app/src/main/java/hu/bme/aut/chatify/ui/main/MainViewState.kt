@@ -6,6 +6,4 @@ object Initialize : MainViewState()
 
 object Loading : MainViewState()
 
-data class MainReady(val response: String) : MainViewState()
-
 data class NetworkError(val response: String) : MainViewState()
